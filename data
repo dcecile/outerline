@@ -1,0 +1,6 @@
+- how to compile
+- how to link
+- how to generate dependency info
+- intermediate targets
+- global flags
+- per-file flags

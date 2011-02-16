@@ -1,0 +1,8 @@
+- query registry
+- find header file
+- find link library file
+- find executable file
+- run bizarre compiler and system checks
+- join paths
+- substitute extensions
+- look at environment variables

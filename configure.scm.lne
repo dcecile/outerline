@@ -1,0 +1,14 @@
+(compiler .scm .c
+          (gsc -c ($ <) -o ($ @)))
+(compiler .c .o
+          (gcc -c ($ <) -o ($ @)
+                  (~z -I
+                      (~c /usr/include
+                          /local/gambit-c/include))))
+(linker .o ($ "")
+        (gcc -c ($ <) -o ($ @)))
+
+(target myproject
+  (src src
+       lib/parse
+       lib/prof))
