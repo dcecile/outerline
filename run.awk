@@ -1,160 +1,311 @@
 BEGIN {
-  strings = 1
+  died = false()
+  readingStrings = true()
   "" in symbols
   main = ""
-  totalEnvSize = 0
-  "" in totalEnv
-  builtinEnv = 0
-  envInit()
-  totalMemSize = 0
-  "" in totalMem
+
+  totalListSize = 0
+  "" in totalList
+  totalStringSize = 0
+  "" in totalString
+  totalStructSize = 0
+  "" in totalStruct
+  totalLambdaSize = 0
+  "" in totalLambda
+
+  globalStrings()
 }
 
-function envInit(builtins) {
-  split("cat chain var", builtins)
-  for (i in builtins) {
-    builtinEnv = envAddBuiltin(builtinEnv, builtins[i])
-  }
+function true() {
+  return 1
 }
-
-function envAddBuiltin(env, name) {
-  totalEnvSize++
-  totalEnv[totalEnvSize, "prev"] = env
-  totalEnv[totalEnvSize, "name"] = name
-  totalEnv[totalEnvSize, "type"] = "builtin"
-  return totalEnvSize
-}
-
-function envAddLambda(env, name, id, boundEnv) {
-  totalEnvSize++
-  totalEnv[totalEnvSize, "prev"] = env
-  totalEnv[totalEnvSize, "name"] = name
-  totalEnv[totalEnvSize, "type"] = "lambda"
-  totalEnv[totalEnvSize, "id"] = id
-  totalEnv[totalEnvSize, "boundEnv"] = boundEnv
-  return totalEnvSize
-}
-
-function envAddValue(env, name, value) {
-  totalEnvSize++
-  totalEnv[totalEnvSize, "prev"] = env
-  totalEnv[totalEnvSize, "name"] = name
-  totalEnv[totalEnvSize, "type"] = "value"
-  totalEnv[totalEnvSize, "value"] = value
-  return totalEnvSize
-}
-
-function envGet(env, name) {
-  while (env != 0) {
-    if (totalEnv[env, "name"] == name) {
-      return env
-    }
-    else {
-      env = totalEnv[env, "prev"]
-    }
-  }
-  print "Couldn't find '" name "'!" > "/dev/stderr"
+function false() {
   return 0
 }
 
-function evalChain(id, env, result) {
-  eval(symbols[id, 2], env, result)
-  env = result["env"]
-  eval(symbols[id, 3], env, result)
+function die(message) {
+  print message > "/dev/stderr"
+  close("/dev/stderr")
+  exit 1
+  died = true()
+}
+function assert(condition, message) {
+  if (!condition) {
+    die(message)
+  }
 }
 
-function evalVar(id, env, result,  nameResult, valueResult, value) {
-  eval(symbols[id, 2], env, nameResult)
-  eval(symbols[id, 3], nameResult["env"], valueResult)
-  result["value"] = valueResult["value"]
-  result["env"] = envAddValue(env, nameResult["value"], valueResult["value"])
+function globalStrings() {
+  keyString = stringNew("key")
+  typeString = stringNew("type")
+  exprString = stringNew("expr")
+  stringStringList = stringListNew(stringNew("string"))
+  callStringList = stringListNew(stringNew("call"))
 }
 
-function eval(id, env, result,  type, opResult, size, i, args, op) {
+function listNew(spec,  i) {
+  totalListSize++
+  totalList[totalListSize, "size"] = spec["size"]
+  for (i = 1; i <= spec["size"]; i++) {
+    totalList[totalListSize, i, "type"] = spec[i, "type"]
+    totalList[totalListSize, i, "id"] = spec[i, "id"]
+  }
+  return totalListSize
+}
+function listNew1(type, value,  listSpec) {
+  listSpec["size"] = 1
+  listSpec[1, "type"] = type
+  listSpec[1, "id"] = value
+  return listNew(listSpec)
+}
+function listGet(id, i, type) {
+  assert((id, "size") in totalList, "Bad list id: " id ", " i ", " type)
+  assert(id > totalList[id, "size"], "Bad list index: " id ", " i ", " type)
+  assert(type == totalList[id, i, "type"], "Bad list type: " id ", " i ", " type)
+  return totalList[id, i, "id"]
+}
+function listGetType(id, i) {
+  assert((id, "size") in totalList, "Bad list id: " id ", " i)
+  assert(id > totalList[id, "size"], "Bad list index: " id ", " i)
+  return totalList[id, i, "type"]
+}
+function listGetSpec(id, spec,  i) {
+  assert((id, "size") in totalList, "Bad list id: " id)
+  spec["size"] = totalList[id, "size"]
+  for (i = 1; i <= spec["size"]; i++) {
+    spec[i, "type"] = totalList[id, i, "type"]
+    spec[i, "id"] = totalList[id, i, "id"]
+  }
+}
+function listGetSize(id) {
+  assert((id, "size") in totalList, "Bad list id: " id)
+  return totalList[id, "size"]
+}
+
+function stringNew(text) {
+  totalStringSize++
+  totalString[totalStringSize] = text
+  return totalStringSize
+}
+function stringListNew(value) {
+  return listNew1("string", value)
+}
+function stringGet(id) {
+  assert(id in totalString, "Bad string id: " id)
+  return totalString[id]
+}
+function stringListGet(id, i) {
+  return stringGet(listGet(id, i, "string"))
+}
+
+function lambdaNew(type) {
+  totalLambdaSize++
+  totalLambda[totalLambdaSize, "type"] = type
+  return totalLambdaSize
+}
+function lambdaGet(id, type) {
+  assert((id, "type") in totalLambda, "Bad lambda id: " id)
+  assert(type == totalLambda[id, "type"], "Bad lambda type: " type)
+}
+function lambdaGetType(id) {
+  assert((id, "type") in totalLambda, "Bad lambda id: " id)
+  return totalLambda[id, "type"]
+}
+function lambdaListNew(value) {
+  return listNew1("lambda", value)
+}
+function lambdaListGet(id, i) {
+  return listGet(id, i, "lambda")
+}
+
+function builtinNew(name,  id) {
+  id = lambdaNew("builtin")
+  totalLambda[id, "name"] = name
+  return id
+}
+function builtinGet(id) {
+  assert(id != 0)
+  lambdaGet(id, "builtin")
+  return totalLambda[id, "name"]
+}
+
+function userNew(code, begin,  id) {
+  id = lambdaNew("user")
+  totalLambda[id, "code"] = code
+  totalLambda[id, "begin"] = begin
+  return id
+}
+function userGetCode(id) {
+  lambdaGet(id, "user")
+  return totalLambda[id, "code"]
+}
+function userGetBegin(id) {
+  lambdaGet(id, "user")
+  return totalLambda[id, "begin"]
+}
+
+function structNew(prev, key, value) {
+  totalStructSize++
+  totalStruct[totalStructSize, "prev"] = prev
+  totalStruct[totalStructSize, "key"] = key
+  totalStruct[totalStructSize, "value"] = value
+  return totalStructSize
+}
+function structGet(struct, key) {
+  while (struct != 0) {
+    if (stringGet(totalStruct[struct, "key"]) == key) {
+      return totalStruct[struct, "value"]
+    }
+    struct = totalStruct[struct, "prev"]
+  }
+  die("Bad struct key: " key)
+}
+function structListGet(id, i, key,  id2) {
+  id2 = listGet(id, i, "struct")
+  assert((id, "key") in totalStruct, "Bad struct id: " id2)
+  return structGet(id2, key)
+}
+
+function exprGet(id, i) {
+  return structListGet(id, i, "expr")
+}
+
+function builtinCat(id, env,  a, b) {
+  print "Running cat"
+  left = eval(exprGet(id, 2), env)
+  right = eval(exprGet(id, 3), env)
+  return stringListNew(stringNew(stringListGet(left, 1) stringListGet(right, 1)))
+}
+
+function builtinCall(id, env,  op, i, listSpec, adHocExpr) {
+  op = eval(exprGet(id, 2), env)
+ 
+  listGetSpec(id, listSpec)
+  for (i = 2; i <= listSpec["size"]; i++) {
+    listSpec[i - 1, "type"] = listSpec[i, "type"]
+    listSpec[i - 1, "id"] = listSpec[i, "id"]
+  }
+  delete listSpec[listSpec["size"], "type"]
+  delete listSpec[listSpec["size"], "id"]
+  listSpec["size"]--
+  adHocExpr = listNew(listSpec)
+
+  return evalLambda(lambdaListGet(op, 1), adHocExpr, env)
+}
+
+function builtinLambda(id, env) {
+  return lambdaListNew(userNew(id, 2))
+}
+
+function evalBuiltin(builtin, id, env,  builtinName) {
+  builtinName = builtinGet(builtin)
+  if (builtinName == "cat") {
+    return builtinCat(id, env)
+  }
+  else if (builtinName == "call") {
+    return builtinCall(id, env)
+  }
+  else if (builtinName == "lambda") {
+    return builtinLambda(id, env)
+  }
+  die("Bad builtin name: " builtinName)
+}
+
+function evalUser(user, id, env,  code, begin) {
+  code = userGetCode(user)
+  begin = userGetBegin(user)
+  if (listGetSize(id) > 1) {
+    arg = lambdaListNew(userNew(id, 2))
+    env = structNew(env, stringNew("x"), arg)
+  }
+  return eval(exprGet(code, begin), env)
+}
+
+function evalLambda(lambda, id, env,  callType) {
+  callType = lambdaGetType(lambda)
+  if (callType == "builtin") {
+    return evalBuiltin(lambda, id, env)
+  }
+  else if (callType == "user") {
+    return evalUser(lambda, id, env)
+  }
+  die("Bad lambda type: " callType)
+}
+
+function eval(id, env,  callName, callValue) {
   print "Eval " id
-  type = symbols[id, "type"]
-
-  if (type == "string") {
-    result["value"] = symbols[id, "text"]
-    result["env"] = env
+  if (listGetType(id, 1) == "string") {
+    return id
   }
-  else if (type == "call") {
-
-    eval(symbols[id, 1], env, opResult)
-    env = opResult["env"]
-
-    name = opResult["value"]
-    op = envGet(env, name)
-
-    if (totalEnv[op, "type"] == "builtin") {
-      if (name == "cat") {
-        evalCat(id, env, result)
-      }
-      else if (name == "var") {
-        evalVar(id, env, result)
-      }
-      else if (name == "chain") {
-        evalChain(id, env, result)
-      }
-      else {
-        print "Unknown builtin!"
-      }
-    }
-    else if (totalEnv[op, "type"] == "value") {
-      result["value"] = totalEnv[op, "value"]
-      result["env"] = env
-    }
-    else {
-      print "Unknown type!"
-    }
+  else {
+    callName = eval(exprGet(id, 1), env)
+    callValue = lambdaListGet(structGet(env, stringListGet(callName, 1)), 1)
+    return evalLambda(callValue, id, env)
   }
 }
 
-function runMain(result) {
-  eval(main, builtinEnv, result)
-  print "Result " result["value"]
+function envInit(  env, builtins, i) {
+  env = 0
+  split("cat call lambda", builtins)
+  for (i in builtins) {
+    env = structNew(env, stringNew(builtins[i]), lambdaListNew(builtinNew(builtins[i])))
+  }
+  return env
+}
+
+function runMain(  builtinEnv, result) {
+  builtinEnv = envInit()
+  result = eval(main, builtinEnv)
+  print "Result " stringListGet(result, 1)
 }
 
 { print }
 
-function addString(  line, id, text) {
-  match($0, /^([^ ]+) (.*$)/, line)
-  id = line[1]
-  text = line[2]
+function parseStringSymbol(  stringLine, id, text) {
+  match($0, /^([^ ]+) (.*$)/, stringLine)
+  id = stringLine[1]
+  text = stringLine[2]
   print "Matched '" id "', '" text "'"
-  symbols[id, "type"] = "string"
-  symbols[id, "text"] = text
+  symbols[id, "id"] = stringListNew(stringNew(text))
+  symbols[id, "type"] = stringStringList
+  print "Bound to " symbols[id, "id"]
 }
 
-function addCall(  i, line, id, text) {
+function parseCallSymbol(  i, line, id, listSpec, exprStruct) {
   id = $1
   print "Matched '" id "'"
-  symbols[id, "type"] = "call"
-  symbols[id, "size"] = NF - 1
+
+  listSpec["size"] = NF - 1
   for (i = 2; i <= NF; i++) {
-    symbols[id, i - 1] = $i
+    exprStruct = structNew(0, typeString, symbols[$i, "type"])
+    exprStruct = structNew(exprStruct, exprString, symbols[$i, "id"])
+    listSpec[i - 1, "type"] = "struct"
+    listSpec[i - 1, "id"] = exprStruct
     print "  " $i
   }
-  main = id
+
+  main = symbols[id, "id"] = listNew(listSpec)
+  symbols[id, "type"] = callStringList
+  print "Bound to " symbols[id, "id"]
 }
 
 /^$/ {
-  print "Done strings"
-  strings = 0
+  print "Done reading strings"
+  readingStrings = false()
   next
 }
 
 {
-  if (strings) {
-    addString()
+  if (readingStrings) {
+    parseStringSymbol()
   }
   else {
-    addCall()
+    parseCallSymbol()
   }
 }
 
 END {
-  if (main) {
+  if (!died && main) {
     runMain()
   }
 }
