@@ -1,3 +1,0 @@
-(cat,
-  dog, # somehow this argument gets lost
-  (cat, fish, bird))

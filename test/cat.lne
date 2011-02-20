@@ -1,3 +1,5 @@
 (cat,
   (cat, dog, ` ),
-  bird)
+  (cat,
+    (cat, lizard  ` , bird),
+    fish))

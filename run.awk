@@ -170,7 +170,7 @@ function exprGet(id, i) {
   return structListGet(id, i, "expr")
 }
 
-function builtinCat(id, env,  a, b) {
+function builtinCat(id, env,  left, right) {
   print "Running cat"
   left = eval(exprGet(id, 2), env)
   right = eval(exprGet(id, 3), env)
