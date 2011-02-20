@@ -197,6 +197,11 @@ function builtinLambda(id, env) {
   return lambdaListNew(userNew(id, 2))
 }
 
+function builtinMain(id, env,  result) {
+  result = eval(exprGet(id, 2), env)
+  print "Result " stringListGet(result, 1)
+}
+
 function evalBuiltin(builtin, id, env,  builtinName) {
   builtinName = builtinGet(builtin)
   if (builtinName == "cat") {
@@ -207,6 +212,9 @@ function evalBuiltin(builtin, id, env,  builtinName) {
   }
   else if (builtinName == "lambda") {
     return builtinLambda(id, env)
+  }
+  else if (builtinName == "main") {
+    return builtinMain(id, env)
   }
   die("Bad builtin name: " builtinName)
 }
@@ -246,17 +254,15 @@ function eval(id, env,  callName, callValue) {
 
 function envInit(  env, builtins, i) {
   env = 0
-  split("cat call lambda", builtins)
+  split("cat call lambda main", builtins)
   for (i in builtins) {
     env = structNew(env, stringNew(builtins[i]), lambdaListNew(builtinNew(builtins[i])))
   }
   return env
 }
 
-function runMain(  builtinEnv, result) {
-  builtinEnv = envInit()
-  result = eval(main, builtinEnv)
-  print "Result " stringListGet(result, 1)
+function runMain() {
+  eval(main, envInit())
 }
 
 { print }

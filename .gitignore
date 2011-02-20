@@ -1,2 +1,5 @@
 /builds
 .*.swp
+*.hi
+*.o
+Parser

@@ -1,0 +1,6 @@
+(call,
+  (lambda,
+    (cat,
+      (x),
+      foo)),
+  bar)
