@@ -28,7 +28,16 @@ argumentExpression (Argument _ e) = e
 
 anyToken = match $ const True
 
-space0 = many (match isSpace) *> pure ()
+comment =
+  text "#"
+  *> many (match (/= '\n'))
+  *> pure ()
+
+space0 =
+  many
+    (comment
+    <|> match isSpace *> pure ())
+  *> pure ()
 
 stringChar =
   (match (== '`') *> anyToken)
