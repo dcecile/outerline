@@ -1,0 +1,10 @@
+- GNU Compiler Collection
+- LLVM Clang
+- Portable C Compiler
+- Intel C Compiler
+- Tiny C Compiler
+- Open64
+- SolarisStudio
+- distcc
+
+(from CompilerDeathMatch)

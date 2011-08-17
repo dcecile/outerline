@@ -1,5 +1,5 @@
-/builds
+/examples/builds
 .*.swp
-*.hi
-*.o
-Parser
+/haskell/*.hi
+/haskell/*.o
+/haskell/Parser

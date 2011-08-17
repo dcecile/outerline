@@ -1,0 +1,12 @@
+# fun def
+(call,
+  (bare lambda,
+    (func set, (caller env), fun,
+      (bare lambda,
+        (var, eval args, (bare eval, (arg env), (args)))
+        (func set, (caller env), (eval args)),
+        (skip, 1, (eval args))))))
+
+(fun, lambda,
+  (bare lambda,
+    (var, args, (split, 

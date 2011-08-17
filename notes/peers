@@ -1,0 +1,8 @@
+- Rebar (CouchDB): https://github.com/basho/rebar
+- SCons (V8): http://www.scons.org/
+- CMake (KDE): 
+- redo: http://synflood.at/blog/index.php?/archives/789-Why-djb-redo-wont-be-the-Git-of-build-systems.html
+- ACR: http://hg.youterm.com/acr
+- Jake (Cappuccino): https://github.com/280north/jake
+- GYP (Chrome): http://code.google.com/p/gyp/wiki/GypVsCMake
+- Waf (Samba): http://code.google.com/p/waf/
