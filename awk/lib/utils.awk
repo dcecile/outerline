@@ -33,6 +33,7 @@ function fail( \
 BEGIN \
 {
   exit_forced = 0
+  NL = "\n"
 }
 
 END \
