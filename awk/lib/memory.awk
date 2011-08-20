@@ -56,7 +56,7 @@ function string_get( \
   return memory[string, "text"]
 }
 
-function list_new( \
+function list_new0( \
   \
   list) \
 {
@@ -74,12 +74,12 @@ function list_add( \
   memory[list, memory[list, "length"]] = value
 }
 
-function list_single( \
-  value, \
+function list_new1( \
+  value1, \
   list) \
 {
-  list = list_new()
-  list_add(list, value)
+  list = list_new0()
+  list_add(list, value1)
   return list
 }
 
@@ -153,7 +153,7 @@ function list_rest( \
 {
   memory_assert_type(list, "list_rest", "list")
   memory_assert_ok(list, "list_first", "in bounds", memory[list, "length"] > 0)
-  rest = list_new()
+  rest = list_new0()
   for (i = 2; i <= memory[list, "length"]; i += 1) {
     list_add(rest, memory[list, i])
   }
@@ -177,7 +177,7 @@ function list_append( \
     return left
   }
   else {
-    list = list_new()
+    list = list_new0()
     if (left_length == 1 && right_length == 1) {
       list_add(list, memory[left, 1])
       list_add(list, memory[right, 1])
@@ -194,7 +194,58 @@ function list_append( \
   }
 }
 
-function record_new() {}
-function record_add() {}
-function record_has() {}
-function record_get() {}
+function record_new0( \
+  \
+  record) \
+{
+  record = memory_new("record")
+  memory[record, "keys", "length"] = 0
+  return record
+}
+
+function record_add( \
+  record, key, value \
+  ) \
+{
+  memory_assert_type(record, "record_add", "record")
+  memory_assert_type(value, "record_add", "list")
+  memory[record, "keys", "length"] += 1
+  memory[record, "keys", memory[record, "keys", "length"]] = key
+  memory[record, "data", key] = value
+}
+
+function record_new1( \
+  key1, value1, \
+  record) \
+{
+  record = record_new0()
+  record_add(record, key1, value1)
+  return record
+}
+
+function record_new2( \
+  key1, value1, key2, value2, \
+  record) \
+{
+  record = record_new0()
+  record_add(record, key1, value1)
+  record_add(record, key2, value2)
+  return record
+}
+
+function record_has( \
+  record, key \
+  ) \
+{
+  memory_assert_type(record, "record_has", "record")
+  return (record SUBSEP "data" SUBSEP key) in memory
+}
+
+function record_get( \
+  record, key \
+  ) \
+{
+  memory_assert_type(record, "record_get", "record")
+  memory_assert_ok(record, "record_get", "valid property", record_has(record, key))
+  return memory[record, "data", key]
+}

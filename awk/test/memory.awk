@@ -18,9 +18,12 @@
 @check("basic list", \
   x, y) \
 {
-  x = list_new()
+  x = list_new0()
   list_add(x, string_new("a"))
   list_add(x, string_new("b"))
+
+  y = list_new1(string_new("c"))
+
   check_matches( \
     list_length(x), \
     2)
@@ -46,7 +49,6 @@
     list_length(list_rest(list_rest(x))), \
     0)
 
-  y = list_single(string_new("c"))
   check_matches( \
     list_length(y), \
     1)
@@ -90,11 +92,11 @@ function check_list_matches( \
       list_append( \
         list_append( \
           list_append( \
-            list_single(string_new("a")), \
-            list_single(string_new("b"))), \
-          list_single(string_new("c"))), \
-        list_single(string_new("d"))), \
-      list_single(string_new("e")))
+            list_new1(string_new("a")), \
+            list_new1(string_new("b"))), \
+          list_new1(string_new("c"))), \
+        list_new1(string_new("d"))), \
+      list_new1(string_new("e")))
 
   y["length"] = 5
   y[1] = "a"
@@ -112,14 +114,14 @@ function check_list_matches( \
 {
   x = \
     list_append( \
-      list_single(string_new("a")), \
+      list_new1(string_new("a")), \
       list_append( \
-        list_single(string_new("b")), \
+        list_new1(string_new("b")), \
         list_append( \
-          list_single(string_new("c")), \
+          list_new1(string_new("c")), \
           list_append( \
-            list_single(string_new("d")), \
-            list_single(string_new("e"))))))
+            list_new1(string_new("d")), \
+            list_new1(string_new("e"))))))
 
   y["length"] = 5
   y[1] = "a"
@@ -130,4 +132,62 @@ function check_list_matches( \
 
   check_list_matches(x, y)
   check_list_matches(x, y)
+}
+
+@check("basic record", \
+  x, y, z ) \
+{
+  x = record_new0()
+  record_add(x, \
+    "a", \
+    list_new1(string_new("b")))
+  record_add(x, \
+    "c", \
+    list_new1(string_new("d")))
+
+  y = record_new1( \
+    "e", \
+    list_new1(string_new("f")))
+
+  z = record_new2( \
+    "g", \
+    list_new1(string_new("h")), \
+    "i", \
+    list_new1(string_new("j")))
+
+  check_matches( \
+    record_has(x, "a"),
+    true())
+  check_matches( \
+    record_has(x, "e"),
+    false())
+  check_matches( \
+    string_get(list_first(record_get(x, "a"))),
+    "b")
+  check_matches( \
+    string_get(list_first(record_get(x, "c"))),
+    "d")
+
+  check_matches( \
+    record_has(y, "e"),
+    true())
+  check_matches( \
+    record_has(y, "g"),
+    false())
+  check_matches( \
+    string_get(list_first(record_get(y, "e"))),
+    "f")
+
+  check_matches( \
+    record_has(z, "g"),
+    true())
+  check_matches( \
+    record_has(z, "a"),
+    false())
+  check_matches( \
+    string_get(list_first(record_get(z, "g"))),
+    "h")
+  check_matches( \
+    string_get(list_first(record_get(z, "i"))),
+    "j")
 }
