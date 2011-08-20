@@ -91,7 +91,7 @@ function list_length( \
 
   len = 0
 
-  for (i = 1; i < memory[list, "length"]; i += 1) {
+  for (i = 1; i <= memory[list, "length"]; i += 1) {
     if (memory[memory[list, i], "type"] == "list") {
       len += list_length(memory[list, i])
     }
@@ -113,18 +113,18 @@ function list_flatten_head( \
   while (memory[memory[list, 1], "type"] == "list") {
     inner = memory[list, 1]
 
-    backup["length"] = memory[list, "length"]
-    for (i = 2; i < memory[list, "length"]; i += 1) {
+    backup["length"] = memory[list, "length"] - 1
+    for (i = 2; i <= memory[list, "length"]; i += 1) {
       backup[i - 1] = memory[list, i]
     }
 
     memory[list, "length"] = 0
-    for (i = 1; i < memory[inner, "length"]; i += 1) {
+    for (i = 1; i <= memory[inner, "length"]; i += 1) {
       list_add(list, memory[inner, i])
     }
 
-    for (i = 1; i < copy["length"]; i += 1) {
-      list_add(list, copy[i])
+    for (i = 1; i <= backup["length"]; i += 1) {
+      list_add(list, backup[i])
     }
   }
 }
@@ -134,30 +134,30 @@ function list_is_empty( \
   ) \
 {
   memory_assert_type(list, "list_is_empty", "list")
-  return memory[list, "length"] > 0
+  return memory[list, "length"] == 0
 }
 
-function list_head( \
+function list_first( \
   list \
   ) \
 {
-  memory_assert_type(list, "list_head", "list")
-  memory_assert_ok(list, "list_head", "in bounds", memory[list, "length"] > 0)
+  memory_assert_type(list, "list_first", "list")
+  memory_assert_ok(list, "list_first", "in bounds", memory[list, "length"] > 0)
   list_flatten_head(list)
   return memory[list, 1]
 }
 
 function list_rest( \
   list, \
-  cdr, i) \
+  rest, i) \
 {
   memory_assert_type(list, "list_rest", "list")
-  memory_assert_ok(list, "list_head", "in bounds", memory[list, "length"] > 0)
-  cdr = list_new()
-  for (i = 2; i < memory[list, "length"]; i += 1) {
-    list_add(cdr, memory[list, i])
+  memory_assert_ok(list, "list_first", "in bounds", memory[list, "length"] > 0)
+  rest = list_new()
+  for (i = 2; i <= memory[list, "length"]; i += 1) {
+    list_add(rest, memory[list, i])
   }
-  return cdr
+  return rest
 }
 
 function list_append( \
