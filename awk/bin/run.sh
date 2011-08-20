@@ -18,6 +18,7 @@ pp="$pp/pp.awk"
 
 # Run the preprocessor
 expanded=$($awk -f $pp $prog)
+#eval echo '"$expanded"' > debug
 
 # Run the program
 eval echo '"[$awk]"' > /dev/stderr

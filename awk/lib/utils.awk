@@ -26,20 +26,10 @@ function fail( \
   ) \
 {
   print(message) > "/dev/stderr"
-  exit_forced = 1
   exit(1)
 }
 
 BEGIN \
 {
-  exit_forced = 0
   NL = "\n"
-}
-
-END \
-{
-  if (exit_forced)
-  {
-    exit(1)
-  }
 }

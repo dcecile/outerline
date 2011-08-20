@@ -39,6 +39,13 @@ function memory_assert_type( \
   memory_assert_ok(id, fnction, memory[id, "type"] == type, "cell of type '" type "'")
 }
 
+function memory_is_string( \
+  id \
+  ) \
+{
+  return memory[id, "type"] == "string"
+}
+
 function string_new( \
   text, \
   string) \
@@ -227,9 +234,35 @@ function record_new2( \
   key1, value1, key2, value2, \
   record) \
 {
-  record = record_new0()
-  record_add(record, key1, value1)
+  record = record_new1(key1, value1)
   record_add(record, key2, value2)
+  return record
+}
+
+function record_new3( \
+  key1, value1, key2, value2, key3, value3, \
+  record) \
+{
+  record = record_new2(key1, value1, key2, value2)
+  record_add(record, key3, value3)
+  return record
+}
+
+function record_new4( \
+  key1, value1, key2, value2, key3, value3, key4, value4, \
+  record) \
+{
+  record = record_new3(key1, value1, key2, value2, key3, value3)
+  record_add(record, key4, value4)
+  return record
+}
+
+function record_new5( \
+  key1, value1, key2, value2, key3, value3, key4, value4, key5, value5, \
+  record) \
+{
+  record = record_new4(key1, value1, key2, value2, key3, value3, key4, value4)
+  record_add(record, key5, value5)
   return record
 }
 
@@ -248,4 +281,11 @@ function record_get( \
   memory_assert_type(record, "record_get", "record")
   memory_assert_ok(record, "record_get", "valid property", record_has(record, key))
   return memory[record, "data", key]
+}
+
+function variant_get( \
+  record \
+  ) \
+{
+  return string_get(list_first(record_get(record, "type")))
 }

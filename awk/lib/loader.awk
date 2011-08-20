@@ -1,14 +1,11 @@
 @use("./utils")
 @use("./memory")
+@use("./expr")
 
 function load_lines( \
   lines, \
-  string_string, call_string, i, j, k, mapping, id, text, items, call_list) \
+  i, j, k, mapping, id, text, items, call_list) \
 {
-  # Cache the two expression types
-  string_string = list_new1(string_new("string"))
-  call_string = list_new1(string_new("call"))
-
   # For each string
   if (lines["length"] < 1) {
     fail("not enough lines to load (at start)")
@@ -25,9 +22,8 @@ function load_lines( \
     text = substr(lines[i], j + 1)
 
     # Add the string to the mapping
-    mapping[id] = record_new2( \
-      "type", string_string, \
-      "string", list_new1(string_new(text)))
+    mapping[id] = expr_new_string( \
+      list_new1(string_new(text)))
     i += 1
   }
 
@@ -50,9 +46,8 @@ function load_lines( \
     }
 
     # Add the call to the mapping
-    mapping[id] = record_new2( \
-      "type", call_string, \
-      "call", call_list)
+    mapping[id] = expr_new_call( \
+      call_list)
     i += 1
   }
 
