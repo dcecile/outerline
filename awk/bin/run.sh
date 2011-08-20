@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Bash safety
+set -u
+set -e
+
 # Grab "awk" (plus arguments)
 awk=$1
 shift
@@ -17,4 +21,4 @@ expanded=$($awk -f $pp $prog)
 
 # Run the program
 eval echo '"[$awk]"' > /dev/stderr
-eval $awk '"$expanded"' '"$@"'
+eval busybox time $awk '"$expanded"' '"$@"'

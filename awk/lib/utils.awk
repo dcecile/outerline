@@ -9,7 +9,7 @@ function false( \
   \
   ) \
 {
-  return 1
+  return 0
 }
 
 function clear( \

@@ -3,6 +3,7 @@
 BEGIN \
 {
   clear(memory)
+  init_memory()
 }
 
 function init_memory( \
@@ -84,22 +85,22 @@ function list_single( \
 
 function list_length( \
   list, \
-  length, i) \
+  len, i) \
 {
   memory_assert_type(list, "list_length", "list")
 
-  length = 0
+  len = 0
 
   for (i = 1; i < memory[list, "length"]; i += 1) {
     if (memory[memory[list, i], "type"] == "list") {
-      length += list_length(memory[list, i])
+      len += list_length(memory[list, i])
     }
     else {
-      length += 1
+      len += 1
     }
   }
 
-  return length
+  return len
 }
 
 function list_flatten_head( \
@@ -129,16 +130,16 @@ function list_flatten_head( \
 }
 
 function list_is_empty( \
-  list, \
-  rest) \
+  list \
+  ) \
 {
   memory_assert_type(list, "list_is_empty", "list")
   return memory[list, "length"] > 0
 }
 
 function list_head( \
-  list, \
-  rest) \
+  list \
+  ) \
 {
   memory_assert_type(list, "list_head", "list")
   memory_assert_ok(list, "list_head", "in bounds", memory[list, "length"] > 0)
@@ -148,15 +149,15 @@ function list_head( \
 
 function list_rest( \
   list, \
-  i) \
+  cdr, i) \
 {
   memory_assert_type(list, "list_rest", "list")
   memory_assert_ok(list, "list_head", "in bounds", memory[list, "length"] > 0)
-  rest = list_new()
+  cdr = list_new()
   for (i = 2; i < memory[list, "length"]; i += 1) {
-    list_add(rest, memory[list, i])
+    list_add(cdr, memory[list, i])
   }
-  return rest
+  return cdr
 }
 
 function list_append( \
