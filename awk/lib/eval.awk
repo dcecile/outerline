@@ -36,9 +36,10 @@ function eval( \
       return eval( \
         call_name, \
         env_push(env), \
-        cont_new4("eval_cont_call_get_name", \
+        cont_new5("eval_cont_call_get_name", \
           "value", value, \
           "args", call_args, \
+          "caller_env", env, \
           "rest", rest, \
           "cont", cont))
     }
@@ -50,7 +51,7 @@ function eval( \
 
 function eval_cont_call_get_name( \
   cont, value, env, \
-  name) \
+  name, search, type) \
 {
   if (list_length(value) != 1 || !memory_is_string(list_first(value))) {
     return cont_fail("expected one string for a call name", cont)
@@ -59,14 +60,36 @@ function eval_cont_call_get_name( \
 
     # Now that the name is calculated, find and call the function
     name = string_get(list_first(value))
-    return call_builtin( \
-      name, \
-      record_get(cont, "args"), \
-      env, \
-      cont_new3("eval_cont_call_get_value",
-        "value", record_get(cont, "value"), \
-        "rest", record_get(cont, "rest"), \
-        "cont", record_get(cont, "cont")))
+    env_try_get(env, name, search)
+
+    # If found in the environment, try to evaluate it
+    if (search["found"]) {
+      type = string_get(list_first(record_get(search["binding"], "type")))
+
+      # Variables can be immediately feed into the next stage
+      if (type == "var") {
+        return eval_cont_call_get_value( \
+          cont, \
+          record_get(search["binding"], "value"), \
+          env)
+      }
+      else {
+        fail("uknown environment binding type: " type)
+      }
+    }
+
+    # Otherwise, try to call it as a builtin
+    else {
+      return call_builtin( \
+        name, \
+        record_get(cont, "args"), \
+        env, \
+        record_get(cont, "caller_env"), \
+        cont_new3("eval_cont_call_get_value",
+          "value", record_get(cont, "value"), \
+          "rest", record_get(cont, "rest"), \
+          "cont", record_get(cont, "cont")))
+    }
   }
 }
 
@@ -83,7 +106,7 @@ function eval_cont_call_get_value( \
     # since the call didn't yield any values
     return eval( \
       record_get(cont, "rest"), \
-      env_pop(env), \
+      env, \
       record_get(cont, "cont"))
   }
   else {
@@ -91,7 +114,7 @@ function eval_cont_call_get_value( \
     # to the value returned by the call that just finished
     return eval( \
       record_get(cont, "rest"), \
-      env_pop(env), \
+      env, \
       cont_new2("eval_cont_append", \
         "value", value, \
         "cont", record_get(cont, "cont")))

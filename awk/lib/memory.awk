@@ -2,6 +2,7 @@
 
 BEGIN \
 {
+  memory_log = false()
   clear(memory)
   init_memory()
 }
@@ -20,6 +21,9 @@ function memory_new( \
   id = memory["next"]
   memory["next"] += 1
   memory[id, "type"] = type
+  if (memory_log) {
+    print("new", type, id)
+  }
   return id
 }
 
@@ -36,7 +40,15 @@ function memory_assert_type( \
   id, fnction, type \
   ) \
 {
-  memory_assert_ok(id, fnction, memory[id, "type"] == type, "cell of type '" type "'")
+  memory_assert_ok(id, fnction, "cell of type '" type "'", memory[id, "type"] == type)
+}
+
+function memory_print( \
+  message, id \
+  ) \
+{
+  print(message, memory[id, "type"], id)
+  return id
 }
 
 function memory_is_string( \
@@ -206,7 +218,19 @@ function record_new0( \
   record) \
 {
   record = memory_new("record")
+  memory[record, "has_base"] = false()
   memory[record, "keys", "length"] = 0
+  return record
+}
+
+function record_xtn0( \
+  base, \
+  record) \
+{
+  memory_assert_type(base, "record_xtn0", "record")
+  record = record_new0()
+  memory[record, "has_base"] = true()
+  memory[record, "base"] = base
   return record
 }
 
@@ -219,6 +243,42 @@ function record_add( \
   memory[record, "keys", "length"] += 1
   memory[record, "keys", memory[record, "keys", "length"]] = key
   memory[record, "data", key] = value
+}
+
+function record_has( \
+  record, key \
+  ) \
+{
+  memory_assert_type(record, "record_has", "record")
+  while (true()) {
+    if ((record SUBSEP "data" SUBSEP key) in memory) {
+      return true()
+    }
+    else if (memory[record, "has_base"]) {
+      record = memory[record, "base"]
+    }
+    else {
+      return false()
+    }
+  }
+}
+
+function record_get( \
+  record, key \
+  ) \
+{
+  memory_assert_type(record, "record_get", "record")
+  while (true()) {
+    if ((record SUBSEP "data" SUBSEP key) in memory) {
+      return memory[record, "data", key]
+    }
+    else if (memory[record, "has_base"]) {
+      record = memory[record, "base"]
+    }
+    else {
+      memory_assert_ok(record, "record_get", "valid property: " key, false())
+    }
+  }
 }
 
 function record_new1( \
@@ -266,21 +326,31 @@ function record_new5( \
   return record
 }
 
-function record_has( \
-  record, key \
-  ) \
+function record_new6( \
+  key1, value1, key2, value2, key3, value3, key4, value4, key5, value5, key6, value6, \
+  record) \
 {
-  memory_assert_type(record, "record_has", "record")
-  return (record SUBSEP "data" SUBSEP key) in memory
+  record = record_new5(key1, value1, key2, value2, key3, value3, key4, value4, key5, value5)
+  record_add(record, key6, value6)
+  return record
 }
 
-function record_get( \
-  record, key \
-  ) \
+function record_xtn1( \
+  base, key1, value1, \
+  record) \
 {
-  memory_assert_type(record, "record_get", "record")
-  memory_assert_ok(record, "record_get", "valid property", record_has(record, key))
-  return memory[record, "data", key]
+  record = record_xtn0(base)
+  record_add(record, key1, value1)
+  return record
+}
+
+function record_xtn2( \
+  base, key1, value1, key2, value2, \
+  record) \
+{
+  record = record_xtn1(base, key1, value1)
+  record_add(record, key2, value2)
+  return record
 }
 
 function variant_get( \

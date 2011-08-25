@@ -79,3 +79,54 @@
     string_get(list_first(x_r)), \
     "abcd")
 }
+
+@check("basic env var", \
+  x_e, x_r) \
+{
+  x_e = load_text( \
+    "cat cat" NL \
+    "var var" NL \
+    "a a" NL \
+    "b b" NL \
+    "" NL \
+    "1 var a b" NL \
+    "2 a" NL \
+    "3 cat 1 a 2")
+  x_r = eval_get_value(x_e, env_new0())
+
+  check_matches( \
+    list_length(x_r), \
+    1)
+  check_matches( \
+    string_get(list_first(x_r)), \
+    "bab")
+}
+
+@check("nested env var", \
+  x_e, x_r) \
+{
+  x_e = load_text( \
+    "cat cat" NL \
+    "var var" NL \
+    "a a" NL \
+    "b b" NL \
+    "c c" NL \
+    "d d" NL \
+    "e e" NL \
+    "" NL \
+    "1 var a b" NL \
+    "2 var a c" NL \
+    "3 var d e" NL \
+    "4 a" NL \
+    "5 d" NL \
+    "6 cat 4 2 3 4 5" NL \
+    "7 cat 1 4 6 4")
+  x_r = eval_get_value(x_e, env_new0())
+
+  check_matches( \
+    list_length(x_r), \
+    1)
+  check_matches( \
+    string_get(list_first(x_r)), \
+    "bbbceceb")
+}

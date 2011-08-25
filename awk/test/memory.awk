@@ -191,3 +191,39 @@ function check_list_matches( \
     string_get(list_first(record_get(z, "i"))),
     "j")
 }
+
+@check("basic record extend", \
+  x, y, z ) \
+{
+  x = record_new2( \
+    "a", list_new1(string_new("b")), \
+    "c", list_new1(string_new("d")))
+
+  y = record_xtn2( \
+    x, \
+    "e", list_new1(string_new("f")), \
+    "a", list_new1(string_new("g")))
+
+
+  check_matches( \
+    record_has(y, "a"),
+    true())
+  check_matches( \
+    record_has(y, "c"),
+    true())
+  check_matches( \
+    record_has(y, "e"),
+    true())
+  check_matches( \
+    record_has(y, "i"),
+    false())
+  check_matches( \
+    string_get(list_first(record_get(y, "a"))),
+    "g")
+  check_matches( \
+    string_get(list_first(record_get(y, "c"))),
+    "d")
+  check_matches( \
+    string_get(list_first(record_get(y, "e"))),
+    "f")
+}
