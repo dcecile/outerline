@@ -1,0 +1,48 @@
+# Welcome to Outerline
+
+(use, special)
+
+(var, variables, are defined)
+
+(say, {they are (variables) before they are used})
+
+(def; functions, x;
+  (map,
+    (fun; y; {(y)...(x)}),
+    1, 2, 3, 4))
+
+(say, {some (cat,
+  {interpolation (cat, # Great
+    is tricky) so}) be careful})
+
+(when;
+  (true),
+    2;
+  else,
+    3, (false))
+
+#(#
+
+Even def is hidden inside a block.
+
+#)#
+
+(say, (join, { }, (functions, y)))
+
+(
+  {
+    }
+  ((
+    {
+      })
+    (
+      ))
+
+#(#
+And
+#(#
+finally, the
+#)#
+recursive
+#)#
+(comment)
