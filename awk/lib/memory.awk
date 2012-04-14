@@ -172,6 +172,7 @@ function list_rest( \
 {
   memory_assert_type(list, "list_rest", "list")
   memory_assert_ok(list, "list_first", "in bounds", memory[list, "length"] > 0)
+  list_flatten_head(list)
   rest = list_new0()
   for (i = 2; i <= memory[list, "length"]; i += 1) {
     list_add(rest, memory[list, i])

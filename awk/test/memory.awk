@@ -60,6 +60,23 @@
     "c")
 }
 
+@check("list flattening", \
+  ) \
+{
+  check_matches( \
+    string_get(list_first(list_rest( \
+      list_append( \
+        list_append( \
+          list_append( \
+            list_append( \
+              list_new1(string_new("a")), \
+              list_new1(string_new("b"))), \
+            list_new1(string_new("c"))), \
+          list_new1(string_new("d"))), \
+        list_new1(string_new("e")))))), \
+    "b")
+}
+
 function check_list_matches( \
   x, y, \
   i) \
