@@ -1,4 +1,4 @@
-@use("../lib/loader")
+@use("../src/loader")
 @use("./check")
 
 function check_loader_call_expr( \

@@ -58,6 +58,20 @@ function memory_is_string( \
   return memory[id, "type"] == "string"
 }
 
+function memory_is_list( \
+  id \
+  ) \
+{
+  return memory[id, "type"] == "list"
+}
+
+function memory_is_record( \
+  id \
+  ) \
+{
+  return memory[id, "type"] == "record"
+}
+
 function string_new( \
   text, \
   string) \
@@ -156,6 +170,14 @@ function list_is_empty( \
   return memory[list, "length"] == 0
 }
 
+function list_is_single( \
+  list \
+  ) \
+{
+  memory_assert_type(list, "list_is_single", "list")
+  return memory[list, "length"] == 1
+}
+
 function list_first( \
   list \
   ) \
@@ -208,6 +230,10 @@ function list_append( \
     }
     else if (right_length == 1) {
       list_add(list, left)
+      list_add(list, memory[right, 1])
+    }
+    else {
+      list_add(list, left)
       list_add(list, right)
     }
     return list
@@ -244,6 +270,18 @@ function record_add( \
   memory[record, "keys", "length"] += 1
   memory[record, "keys", memory[record, "keys", "length"]] = key
   memory[record, "data", key] = value
+}
+
+function record_keys( \
+  record, keys, \
+  i) \
+{
+  memory_assert_type(record, "record_keys", "record")
+  keys["length"] = memory[record, "keys", "length"]
+  for (i = 1; i <= keys["length"]; i += 1)
+  {
+    keys[i] = memory[record, "keys", i]
+  }
 }
 
 function record_has( \

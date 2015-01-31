@@ -1,4 +1,4 @@
-@use("../lib/memory")
+@use("../src/memory")
 @use("./check")
 
 @check("basic string", \
@@ -146,6 +146,74 @@ function check_list_matches( \
   y[3] = "c"
   y[4] = "d"
   y[5] = "e"
+
+  check_list_matches(x, y)
+  check_list_matches(x, y)
+}
+
+@check("equal-in append", \
+  x, y, i ) \
+{
+  x = \
+    list_append( \
+      list_append( \
+        list_new1(string_new("a")), \
+        list_append( \
+          list_new1(string_new("b")), \
+          list_append( \
+            list_new1(string_new("c")), \
+            list_new1(string_new("d"))))), \
+      list_append( \
+        list_append( \
+          list_append( \
+            list_new1(string_new("e")), \
+            list_new1(string_new("f"))), \
+          list_new1(string_new("g"))), \
+        list_new1(string_new("h"))))
+
+  y["length"] = 8
+  y[1] = "a"
+  y[2] = "b"
+  y[3] = "c"
+  y[4] = "d"
+  y[5] = "e"
+  y[6] = "f"
+  y[7] = "g"
+  y[8] = "h"
+
+  check_list_matches(x, y)
+  check_list_matches(x, y)
+}
+
+@check("equal-out append", \
+  x, y, i ) \
+{
+  x = \
+    list_append( \
+      list_append( \
+        list_append( \
+          list_append( \
+            list_new1(string_new("a")), \
+            list_new1(string_new("b"))), \
+          list_new1(string_new("c"))), \
+        list_new1(string_new("d"))), \
+      list_append( \
+        list_new1(string_new("e")), \
+        list_append( \
+          list_new1(string_new("f")), \
+          list_append( \
+            list_new1(string_new("g")), \
+            list_new1(string_new("h"))))))
+
+  y["length"] = 8
+  y[1] = "a"
+  y[2] = "b"
+  y[3] = "c"
+  y[4] = "d"
+  y[5] = "e"
+  y[6] = "f"
+  y[7] = "g"
+  y[8] = "h"
 
   check_list_matches(x, y)
   check_list_matches(x, y)

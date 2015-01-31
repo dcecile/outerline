@@ -1,4 +1,4 @@
-@use("../lib/utils")
+@use("../src/utils")
 
 function check_bold( \
   text \

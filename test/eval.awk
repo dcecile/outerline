@@ -1,7 +1,7 @@
-@use("../lib/expr")
-@use("../lib/loader")
-@use("../lib/env")
-@use("../lib/eval")
+@use("../src/expr")
+@use("../src/loader")
+@use("../src/env")
+@use("../src/eval")
 @use("./check")
 
 @check("basic string eval", \

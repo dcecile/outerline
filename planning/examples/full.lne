@@ -12,7 +12,7 @@
     1, 2, 3, 4))
 
 (say, {some (cat,
-  {interpolation (cat, # Great
+  {interpolation (var, # Great
     is tricky) so}) be careful})
 
 (when;

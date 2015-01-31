@@ -26,6 +26,7 @@ function fail( \
   ) \
 {
   print(message) > "/dev/stderr"
+  close("/dev/stderr")
   exit(1)
 }
 
