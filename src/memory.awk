@@ -373,7 +373,7 @@ function record_get( \
       record = memory[record, "base"]
     }
     else {
-      memory_assert_ok(record, "record_get", "valid property: " key, false())
+      memory_assert_ok(record, "record_get / " key, "valid property: " key, false())
     }
   }
 }

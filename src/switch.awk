@@ -9,7 +9,7 @@ function call_builtin( \
     return builtin_var(blocks, env, caller_env, cont)
   }
   else {
-    return fail("undefined variable/function: " name)
+    fail("undefined variable/function: " name)
   }
 }
 
@@ -25,9 +25,6 @@ function call_cont( \
   }
   else if (name == "eval_cont_call_get_value") {
     return eval_cont_call_get_value(cont, value, env)
-  }
-  else if (name == "eval_cont_append") {
-    return eval_cont_append(cont, value, env)
   }
   else if (name == "eval_root_cont") {
     return eval_root_cont(cont, value, env)

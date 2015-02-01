@@ -5,10 +5,11 @@ function builtin_cat( \
   ) \
 {
   if (!list_is_single(blocks)) {
-    return fail("expected one block for builtin 'cat'")
+    fail("expected one block for builtin 'cat'")
   }
 
   return eval_args( \
+    list_new0(), \
     record_get(list_first(blocks), "args"), \
     env, \
     cont_new2("builtin_cat_cont", \
@@ -23,7 +24,7 @@ function builtin_cat_cont( \
   result = ""
   while (!list_is_empty(value)) {
     if (!memory_is_string(list_first(value))) {
-      return fail("expected all strings for builtin 'cat'")
+      fail("expected all strings for builtin 'cat'")
     }
     result = result string_get(list_first(value))
     value = list_rest(value)
@@ -40,10 +41,11 @@ function builtin_var( \
   ) \
 {
   if (!list_is_single(blocks)) {
-    return fail("expected one block for builtin 'var'")
+    fail("expected one block for builtin 'var'")
   }
 
   return eval_args( \
+    list_new0(), \
     record_get(list_first(blocks), "args"), \
     env, \
     cont_new2("builtin_var_cont", \
@@ -56,7 +58,7 @@ function builtin_var_cont( \
   name, result) \
 {
   if (list_is_empty(value) || !memory_is_string(list_first(value))) {
-    return fail("expected string name argument for builtin 'var'")
+    fail("expected string name argument for builtin 'var'")
   }
 
   name = string_get(list_first(value))
