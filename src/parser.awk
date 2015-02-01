@@ -80,7 +80,7 @@ function parse_end_argument( \
 {
   all_arguments = stack[stack["size"], "arguments"]
   next_argument = stack[stack["size"], "next_argument"]
-  
+
   if (!next_argument) {
     # No explicit arguments
     next_argument = \

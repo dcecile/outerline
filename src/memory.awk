@@ -136,30 +136,54 @@ function list_length( \
   return len
 }
 
-function list_flatten_head( \
+function list_convert_to_forward_traversal_form( \
   list, \
-  inner, backup, i) \
+  first_item, reverse_rest, reverse_rest_length, rest_list, next_rest_list, i) \
 {
-  memory_assert_type(list, "list_flatten_head", "list")
-  memory_assert_ok(list, "list_flatten_head", "in bounds", memory[list, "length"] > 0)
+  memory_assert_type(list, "list_convert_to_forward_traversal_form", "list")
+  memory_assert_ok(list, "list_convert_to_forward_traversal_form", "in bounds", memory[list, "length"] > 1)
 
-  while (memory[memory[list, 1], "type"] == "list") {
-    inner = memory[list, 1]
-
-    backup["length"] = memory[list, "length"] - 1
-    for (i = 2; i <= memory[list, "length"]; i += 1) {
-      backup[i - 1] = memory[list, i]
-    }
-
-    memory[list, "length"] = 0
-    for (i = 1; i <= memory[inner, "length"]; i += 1) {
-      list_add(list, memory[inner, i])
-    }
-
-    for (i = 1; i <= backup["length"]; i += 1) {
-      list_add(list, backup[i])
-    }
+  # Correct form has one non-list followed by one list or non-list
+  if (memory[list, "length"] == 2 && memory[memory[list, 1], "type"] != "list") {
+    return
   }
+
+  # Gather up "rest" elements (non-lists or lists) starting with the root
+  # and progressing through the first's firsts
+  reverse_rest_length = 0
+  first_item = list
+  while (memory[first_item, "type"] == "list") {
+    for (i = memory[first_item, "length"]; i >= 2 ; i -= 1) {
+      reverse_rest[reverse_rest_length + 1] = memory[first_item, i]
+      reverse_rest_length += 1
+    }
+    first_item = memory[first_item, 1]
+  }
+
+  # Because the first of the root was a list, and the root also has at least one
+  # rest item, the full list of rest items should be more than one
+  memory_assert_ok(list, "list_convert_to_forward_traversal_form", "plenty", reverse_rest_length > 1)
+
+  # Put the first item and a list containing the next item
+  memory[list, 1] = first_item
+  memory[list, 2] = rest_list = list_new1(reverse_rest[reverse_rest_length])
+
+  # Link each of the rest items except the last into separate lists
+  for (i = reverse_rest_length - 1; i >= 2; i -= 1) {
+    next_rest_list = list_new1(reverse_rest[i])
+    list_add(rest_list, next_rest_list)
+    rest_list = next_rest_list
+  }
+
+  # Don't create a new list for the last item, because it would be a list of one
+  list_add(rest_list, reverse_rest[1])
+
+  # Clean up memory after the conversion
+  for (i = 3; i < memory[list, "length"]; i += 1) {
+    delete memory[list, i]
+  }
+
+  memory[list, "length"] = 2
 }
 
 function list_is_empty( \
@@ -184,8 +208,14 @@ function list_first( \
 {
   memory_assert_type(list, "list_first", "list")
   memory_assert_ok(list, "list_first", "in bounds", memory[list, "length"] > 0)
-  list_flatten_head(list)
-  return memory[list, 1]
+
+  if (memory[list, "length"] == 1) {
+    return memory[list, 1]
+  }
+  else {
+    list_convert_to_forward_traversal_form(list)
+    return memory[list, 1]
+  }
 }
 
 function list_rest( \
@@ -194,12 +224,19 @@ function list_rest( \
 {
   memory_assert_type(list, "list_rest", "list")
   memory_assert_ok(list, "list_first", "in bounds", memory[list, "length"] > 0)
-  list_flatten_head(list)
-  rest = list_new0()
-  for (i = 2; i <= memory[list, "length"]; i += 1) {
-    list_add(rest, memory[list, i])
+
+  if (memory[list, "length"] == 1) {
+    return list_new0()
   }
-  return rest
+  else {
+    list_convert_to_forward_traversal_form(list)
+    if (memory[memory[list, 2], "type"] == "list") {
+      return memory[list, 2]
+    }
+    else {
+      return list_new1(memory[list, 2])
+    }
+  }
 }
 
 function list_append( \
