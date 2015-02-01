@@ -116,6 +116,27 @@ function list_new1( \
   return list
 }
 
+function list_new2( \
+  value1, value2, \
+  list) \
+{
+  list = list_new0()
+  list_add(list, value1)
+  list_add(list, value2)
+  return list
+}
+
+function list_new3( \
+  value1, value2, value3, \
+  list) \
+{
+  list = list_new0()
+  list_add(list, value1)
+  list_add(list, value2)
+  list_add(list, value3)
+  return list
+}
+
 function list_length( \
   list, \
   len, i) \
@@ -325,7 +346,7 @@ function record_has( \
   record, key \
   ) \
 {
-  memory_assert_type(record, "record_has", "record")
+  memory_assert_type(record, "record_has / " key, "record")
   while (true()) {
     if ((record SUBSEP "data" SUBSEP key) in memory) {
       return true()
@@ -343,7 +364,7 @@ function record_get( \
   record, key \
   ) \
 {
-  memory_assert_type(record, "record_get", "record")
+  memory_assert_type(record, "record_get / " key, "record")
   while (true()) {
     if ((record SUBSEP "data" SUBSEP key) in memory) {
       return memory[record, "data", key]

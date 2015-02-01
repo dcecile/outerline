@@ -1,15 +1,15 @@
 function call_builtin( \
-  name, args, args_env, caller_env, cont \
+  name, blocks, env, caller_env, cont \
   ) \
 {
   if (name == "cat") {
-    return builtin_cat(args, args_env, caller_env, cont)
+    return builtin_cat(blocks, env, caller_env, cont)
   }
   if (name == "var") {
-    return builtin_var(args, args_env, caller_env, cont)
+    return builtin_var(blocks, env, caller_env, cont)
   }
   else {
-    return cont_fail("undefined variable/function: " name, cont)
+    return fail("undefined variable/function: " name)
   }
 }
 
@@ -29,8 +29,8 @@ function call_cont( \
   else if (name == "eval_cont_append") {
     return eval_cont_append(cont, value, env)
   }
-  else if (name == "eval_get_value_cont") {
-    return eval_get_value_cont(cont, value, env)
+  else if (name == "eval_root_cont") {
+    return eval_root_cont(cont, value, env)
   }
   else if (name == "builtin_cat_cont") {
     return builtin_cat_cont(cont, value, env)

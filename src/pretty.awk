@@ -9,8 +9,8 @@ function pretty_print( \
 }
 
 function pretty_print_awk_literal( \
-  id \
-  ) \
+  id, \
+  result) \
 {
   result = pretty_print(id)
   sub(/^/, "\"", result)

@@ -1,132 +1,134 @@
 @use("../src/expr")
-@use("../src/loader")
+@use("../src/parser")
 @use("../src/env")
 @use("../src/eval")
 @use("./check")
 
 @check("basic string eval", \
-  x_e, x_r, y_e, y_r) \
+  input_a, result_a, input_b, result_b) \
 {
-  x_e = list_new1(expr_new_string( \
-    list_new1(string_new("a"))))
-  x_r = eval_get_value(x_e, env_new0())
+  input_a = list_new1( \
+    expr_new_string(list_new1(string_new("a"))))
+  result_a = eval_root(list_new1(expr_new_block(input_a)))
 
-  y_e = list_new0()
-  list_add(y_e, expr_new_string( \
-    list_new1(string_new("b"))))
-  list_add(y_e, expr_new_string( \
-    list_new1(string_new("c"))))
-  y_r = eval_get_value(y_e, env_new0())
+  input_b = list_new2( \
+    expr_new_string(list_new1(string_new("b"))), \
+    expr_new_string(list_new1(string_new("c"))))
+  result_b = eval_root(list_new1(expr_new_block(input_b)))
 
   check_matches( \
-    list_length(x_r), \
+    list_length(result_a), \
     1)
   check_matches( \
-    string_get(list_first(x_r)), \
+    string_get(list_first(result_a)), \
     "a")
 
   check_matches( \
-    list_length(y_r), \
+    list_length(result_b), \
     2)
   check_matches( \
-    string_get(list_first(y_r)), \
+    string_get(list_first(result_b)), \
     "b")
   check_matches( \
-    string_get(list_first(list_rest(y_r))), \
+    string_get(list_first(list_rest(result_b))), \
     "c")
 }
 
 @check("basic call eval", \
-  x_c_e, x_e, x_r) \
+  input, result) \
 {
-  x_c_e = list_new0()
-  list_add(x_c_e, expr_new_string( \
-    list_new1(string_new("cat"))))
-  list_add(x_c_e, expr_new_string( \
-    list_new1(string_new("abc"))))
-  list_add(x_c_e, expr_new_string( \
-    list_new1(string_new("def"))))
-  x_e = list_new1(expr_new_call(x_c_e))
+  input = list_new1(expr_new_call(list_new2( \
+    expr_new_block(list_new1( \
+      expr_new_string(list_new1(string_new("cat"))))), \
+    expr_new_block(list_new2( \
+      expr_new_string(list_new1(string_new("abc"))), \
+      expr_new_string(list_new1(string_new("def"))))))))
 
-  x_r = eval_get_value(x_e, env_new0())
+  result = eval_root(list_new1(expr_new_block(input)))
 
   check_matches( \
-    list_length(x_r), \
+    list_length(result), \
     1)
   check_matches( \
-    string_get(list_first(x_r)), \
+    string_get(list_first(result)), \
     "abcdef")
 }
 
 @check("nested call eval", \
-  x_e, x_r) \
+  input, result) \
 {
-  x_e = load_text( \
-    "0 cat" NL \
-    "1 a" NL \
-    "2 b" NL \
-    "3 c" NL \
-    "4 d" NL \
-    "" NL \
-    "5 0 2 3" NL \
-    "6 0 1 5 4")
-  x_r = eval_get_value(x_e, env_new0())
+  input = list_new1(expr_new_call(list_new2( \
+    expr_new_block(list_new1( \
+      expr_new_string(list_new1(string_new("cat"))))), \
+    expr_new_block(list_new3( \
+      expr_new_string(list_new1(string_new("a"))), \
+      expr_new_call(list_new2( \
+        expr_new_block(list_new1( \
+          expr_new_string(list_new1(string_new("cat"))))), \
+        expr_new_block(list_new2( \
+          expr_new_string(list_new1(string_new("b"))), \
+          expr_new_string(list_new1(string_new("c"))))))), \
+      expr_new_string(list_new1(string_new("d"))))))))
+
+  result = eval_root(list_new1(expr_new_block(input)))
 
   check_matches( \
-    list_length(x_r), \
+    list_length(result), \
     1)
   check_matches( \
-    string_get(list_first(x_r)), \
+    string_get(list_first(result)), \
     "abcd")
 }
 
 @check("basic env var", \
-  x_e, x_r) \
+  input, result) \
 {
-  x_e = load_text( \
-    "cat cat" NL \
-    "var var" NL \
-    "a a" NL \
-    "b b" NL \
-    "" NL \
-    "1 var a b" NL \
-    "2 a" NL \
-    "3 cat 1 a 2")
-  x_r = eval_get_value(x_e, env_new0())
+  input = list_new1(expr_new_call(list_new2( \
+    expr_new_block(list_new1( \
+      expr_new_string(list_new1(string_new("cat"))))), \
+    expr_new_block(list_new3( \
+      expr_new_call(list_new2( \
+        expr_new_block(list_new1( \
+          expr_new_string(list_new1(string_new("var"))))), \
+        expr_new_block(list_new2( \
+          expr_new_string(list_new1(string_new("a"))), \
+          expr_new_string(list_new1(string_new("b"))))))), \
+      expr_new_string(list_new1(string_new("a"))), \
+      expr_new_call(list_new1( \
+        expr_new_block(list_new1( \
+          expr_new_string(list_new1(string_new("a"))))))))))))
+
+  result = eval_root(list_new1(expr_new_block(input)))
 
   check_matches( \
-    list_length(x_r), \
+    list_length(result), \
     1)
   check_matches( \
-    string_get(list_first(x_r)), \
+    string_get(list_first(result)), \
     "bab")
 }
 
 @check("nested env var", \
-  x_e, x_r) \
+  input, result) \
 {
-  x_e = load_text( \
-    "cat cat" NL \
-    "var var" NL \
-    "a a" NL \
-    "b b" NL \
-    "c c" NL \
-    "d d" NL \
-    "e e" NL \
-    "" NL \
-    "1 var a b" NL \
-    "2 var a c" NL \
-    "3 var d e" NL \
-    "4 a" NL \
-    "5 d" NL \
-    "6 cat 4 2 3 4 5" NL \
-    "7 cat 1 4 6 4")
-  x_r = eval_get_value(x_e, env_new0())
+  input = parse_text( \
+    "(cat;" NL \
+    "  (var; a, b)," NL \
+    "  (a)," NL \
+    "  (cat;" NL \
+    "    (a)," NL \
+    "    (var; a, c)," NL \
+    "    (var; d, e)," NL \
+    "    (a)," NL \
+    "    (d))," NL \
+    "  (a))")
+
+  result = eval_root(input)
 
   check_matches( \
-    list_length(x_r), \
+    list_length(result), \
     1)
   check_matches( \
-    string_get(list_first(x_r)), \
+    string_get(list_first(result)), \
     "bbbceceb")
 }

@@ -46,10 +46,3 @@ function cont_new5( \
   return list_new1(record_new6("name", list_new1(string_new(name)),
     key1, value1, key2, value2, key3, value3, key4, value4, key5, value5))
 }
-
-function cont_fail( \
-  message, cont \
-  ) \
-{
-  fail(message)
-}

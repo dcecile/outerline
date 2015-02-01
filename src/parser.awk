@@ -9,6 +9,7 @@ function parse_push_call( \
 {
   stack["size"] += 1
 
+  stack[stack["size"], "blocks"] = list_new0()
   stack[stack["size"], "arguments"] = list_new0()
   stack[stack["size"], "next_argument"] = false()
 }
@@ -42,15 +43,15 @@ function parse_begin_call( \
 }
 
 function parse_end_call( \
-  stack, text, \
-  arguments, old_statements)
+  stack, text \
+  )
 {
-  # Finish the current argument
-  text = parse_end_argument(stack, text)
+  # Finish the current block
+  text = parse_end_block(stack, text)
 
   # The parent argument is finished
   stack[stack["size"] - 1, "next_argument"] = \
-    expr_new_call(stack[stack["size"], "arguments"])
+    expr_new_call(stack[stack["size"], "blocks"])
 
   # The call is finished
   parse_pop_call(stack)
@@ -59,19 +60,37 @@ function parse_end_call( \
 }
 
 function parse_end_file( \
-  stack, text, \
-  arguments)
+  stack, text \
+  )
 {
   if (stack["size"] > 1)
   {
     fail("unexpected end - missing something")
   }
 
+  # Finish the current block
+  text = parse_end_block(stack, text)
+
+  # Done everything
+  return stack[stack["size"], "blocks"]
+}
+
+function parse_end_block( \
+  stack, text \
+  )
+{
   # Finish the current argument
   text = parse_end_argument(stack, text)
 
-  # Done everything
-  return stack[stack["size"], "arguments"]
+  # Add this block
+  list_add( \
+    stack[stack["size"], "blocks"],
+    expr_new_block(stack[stack["size"], "arguments"]))
+  stack[stack["size"], "arguments"] = list_new0()
+
+  text = parse_eat_whitespace(text)
+
+  return text
 }
 
 function parse_end_argument( \
@@ -160,6 +179,9 @@ function parse_text( \
     }
 
     # Semicolon
+    else if (sub(/^;/, "", text)) {
+      text = parse_end_block(stack, text)
+    }
 
     # Begin interpolation
 
