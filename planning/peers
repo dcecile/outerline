@@ -6,8 +6,13 @@
 - Jake (Cappuccino): https://github.com/280north/jake
 - GYP (Chrome): http://code.google.com/p/gyp/wiki/GypVsCMake
 - Waf (Samba): http://code.google.com/p/waf/
+  - ABI checking and fully-linked developer binaries
 - Ceedling: http://throwtheswitch.org/white-papers/ceedling-intro.html
 - Grunt: http://weblog.bocoup.com/introducing-grunt/
 - Premake: http://industriousone.com/premake
 - GruntJS: http://gruntjs.com/
 - Rake: http://rake.rubyforge.org/
+- Bazel: http://bazel.io/
+- Boost.Build: http://www.boost.org/build/
+- Perforce Jam: http://www.perforce.com/resources/documentation/jam
+- Gradle: http://gradle.org/

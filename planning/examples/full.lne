@@ -1,19 +1,19 @@
 # Welcome to Outerline
 
-(use, special)
+(use; special)
 
-(var, variables, are defined)
+(def; variables; are defined)
 
-(say, {they are (variables) before they are used})
+(say; {they are (variables) before they are used})
 
-(def; functions, x;
-  (map,
-    (fun; y; {(y)...(x)}),
+(def proc; f; x;
+  (map;
+    (proc; y; {(y)...(x)}),
     1, 2, 3, 4))
 
-(say, {some (cat,
-  {interpolation (var, # Great
-    is tricky) so}) be careful})
+(say; {some (cat;
+  {interpolation (cat; # Great
+    is, tricky) so}, must) be careful})
 
 (when;
   (true),
@@ -23,11 +23,11 @@
 
 #(#
 
-Even def is hidden inside a block.
+Even def is hidden inside a comment block.
 
 #)#
 
-(say, (join, { }, (functions, y)))
+(say; (join; { }, (functions; y)))
 
 (
   {
@@ -36,7 +36,7 @@ Even def is hidden inside a block.
     {
       })
     (
-      ))
+      )))
 
 #(#
 And
